@@ -4,22 +4,11 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { OnlineToggle } from '@/components/ui/online-toggle';
-
-// Mock data for the demand graph
-const demandData = [
-  { hour: '9AM', demand: 20 },
-  { hour: '12PM', demand: 45 },
-  { hour: '3PM', demand: 30 },
-  { hour: '6PM', demand: 60 },
-  { hour: '9PM', demand: 40 },
-];
+import { demandData, surveyDashboardData } from '@/lib/data/mock-dashboard';
 
 export default function SurveyDashboard() {
   const [isOnline, setIsOnline] = useState(false);
-  const [weeklyGoal] = useState(100);
-  const [currentEarnings] = useState(0);
-  const [completedSurveys] = useState(0);
-  const [callMinutes] = useState(0);
+  const { stats, rates } = surveyDashboardData;
 
   return (
     <div className="p-4 space-y-4">
@@ -38,13 +27,15 @@ export default function SurveyDashboard() {
         <CardContent className="space-y-2">
           <div className="flex justify-between text-gray-700">
             <span>Text Surveys</span>
-            <span className="font-semibold">$0.25 per text</span>
+            <span className="font-semibold">${rates.textSurvey.toFixed(2)} per text</span>
           </div>
           <div className="flex justify-between text-gray-700">
             <span>Phone Surveys</span>
-            <span className="font-semibold">$1.00 per minute</span>
+            <span className="font-semibold">${rates.phoneCall.toFixed(2)} per minute</span>
           </div>
-          <Badge className="bg-blue-500 hover:bg-blue-600">Surge Pricing Active</Badge>
+          {rates.surgePricing && (
+            <Badge className="bg-blue-500 hover:bg-blue-600">Surge Pricing Active</Badge>
+          )}
         </CardContent>
       </Card>
 
@@ -75,10 +66,10 @@ export default function SurveyDashboard() {
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="flex justify-between text-sm text-gray-600">
-            <span>Current: ${currentEarnings}</span>
-            <span>Goal: ${weeklyGoal}</span>
+            <span>Current: ${stats.currentEarnings}</span>
+            <span>Goal: ${stats.weeklyGoal}</span>
           </div>
-          <Progress value={(currentEarnings / weeklyGoal) * 100} />
+          <Progress value={(stats.currentEarnings / stats.weeklyGoal) * 100} />
         </CardContent>
       </Card>
 
@@ -86,7 +77,7 @@ export default function SurveyDashboard() {
         <Card className="bg-white shadow-lg">
           <CardContent className="pt-6">
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-800">{completedSurveys}</p>
+              <p className="text-2xl font-bold text-gray-800">{stats.completedSurveys}</p>
               <p className="text-sm text-gray-600">Completed Surveys</p>
             </div>
           </CardContent>
@@ -94,7 +85,7 @@ export default function SurveyDashboard() {
         <Card className="bg-white shadow-lg">
           <CardContent className="pt-6">
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-800">{callMinutes}</p>
+              <p className="text-2xl font-bold text-gray-800">{stats.callMinutes}</p>
               <p className="text-sm text-gray-600">Call Minutes</p>
             </div>
           </CardContent>

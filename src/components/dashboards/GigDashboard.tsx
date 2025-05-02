@@ -1,6 +1,7 @@
 import React from 'react';
 import { BellIcon, UserCircleIcon, ClockIcon, ClipboardDocumentIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '@/contexts/AuthContext';
+import { gigDashboardData, ActivityItem as ActivityItemType } from '@/lib/data/mock-dashboard';
 
 interface StatCardProps {
   label: string;
@@ -18,11 +19,7 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, icon }) => (
   </div>
 );
 
-interface ActivityItemProps {
-  id: string;
-  timestamp: string;
-  earnings: number;
-}
+interface ActivityItemProps extends ActivityItemType {}
 
 const ActivityItem: React.FC<ActivityItemProps> = ({ id, timestamp, earnings }) => (
   <div className="bg-gray-800 rounded-lg p-4 mb-3 flex items-center justify-between">
@@ -41,18 +38,7 @@ export default function GigDashboard() {
   const { user } = useAuth();
   const [isOnline, setIsOnline] = React.useState(false);
 
-  // Example data - in real app, this would come from your backend
-  const stats = {
-    earnings: 54.20,
-    jobsCompleted: 8,
-    timeOnline: "3h 22m"
-  };
-
-  const recentActivity = [
-    { id: "1234", timestamp: "14:30", earnings: 12.50 },
-    { id: "1233", timestamp: "13:15", earnings: 15.75 },
-    { id: "1232", timestamp: "12:00", earnings: 25.95 }
-  ];
+  const { stats, recentActivity } = gigDashboardData;
 
   return (
     <div className="min-h-screen bg-gray-900 p-6">
@@ -110,9 +96,7 @@ export default function GigDashboard() {
           {recentActivity.map((activity) => (
             <ActivityItem
               key={activity.id}
-              id={activity.id}
-              timestamp={activity.timestamp}
-              earnings={activity.earnings}
+              {...activity}
             />
           ))}
         </div>
