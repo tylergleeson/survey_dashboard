@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     last_name TEXT,
     birthday DATE,
     email TEXT UNIQUE NOT NULL,
+    current_state TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );

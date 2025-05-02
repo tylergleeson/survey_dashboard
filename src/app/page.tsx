@@ -10,13 +10,23 @@ export default function Home() {
 
   useEffect(() => {
     if (!loading) {
-      if (user) {
-        router.push('/dashboard');
+      // If not authenticated, redirect to login
+      if (!user) {
+        router.replace('/login');
       } else {
-        router.push('/login');
+        router.replace('/dashboard');
       }
     }
   }, [router, user, loading]);
+
+  // Show nothing while checking auth status
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return null;
 }

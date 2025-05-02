@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { OnlineToggle } from '@/components/ui/online-toggle';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 // Mock data for the demand graph
 const demandData = [
@@ -16,7 +17,7 @@ const demandData = [
   { hour: '9PM', demand: 40 },
 ];
 
-export default function Dashboard() {
+function Dashboard() {
   const [isOnline, setIsOnline] = useState(false);
   const [weeklyGoal] = useState(100);
   const [currentEarnings] = useState(0);
@@ -115,5 +116,13 @@ export default function Dashboard() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function ProtectedDashboard() {
+  return (
+    <ProtectedRoute>
+      <Dashboard />
+    </ProtectedRoute>
   );
 } 

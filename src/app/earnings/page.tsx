@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import dynamic from 'next/dynamic';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 const Charts = dynamic(() => import('./components/Charts'), { 
   ssr: false,
@@ -67,7 +68,7 @@ const mockEarnings: Earnings[] = [
   }
 ];
 
-export default function Earnings() {
+function Earnings() {
   const [earnings] = useState<Earnings[]>(mockEarnings);
   const [isMounted, setIsMounted] = useState(false);
   const [chartData, setChartData] = useState<Array<{ name: string; value: number }>>([]);
@@ -124,5 +125,13 @@ export default function Earnings() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function ProtectedEarnings() {
+  return (
+    <ProtectedRoute>
+      <Earnings />
+    </ProtectedRoute>
   );
 } 

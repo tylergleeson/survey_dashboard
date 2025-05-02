@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 interface UserSettings {
   weekly_goal: number;
@@ -20,7 +21,7 @@ interface UserProfile {
   birthday: string;
 }
 
-export default function ProfilePage() {
+function ProfilePage() {
   const router = useRouter();
   const { user, signOut } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -147,5 +148,13 @@ export default function ProfilePage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function ProtectedProfilePage() {
+  return (
+    <ProtectedRoute>
+      <ProfilePage />
+    </ProtectedRoute>
   );
 } 

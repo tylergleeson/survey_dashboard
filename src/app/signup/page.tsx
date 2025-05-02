@@ -42,19 +42,39 @@ const validateEmail = (email: string) => {
   return "";
 };
 
+// Add US states array
+const US_STATES = [
+  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
+  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
+  'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+  'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
+  'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'
+];
+
 export default function SignUpPage() {
   const router = useRouter();
   const { signUp } = useAuth();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [birthday, setBirthday] = useState("");
+  const [month, setMonth] = useState("");
+  const [day, setDay] = useState("");
+  const [year, setYear] = useState("");
+  const [currentState, setCurrentState] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
   const [emailError, setEmailError] = useState("");
   const [isConfirmationSent, setIsConfirmationSent] = useState(false);
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Format the date as YYYY-MM-DD for the backend
+  const getBirthday = () => {
+    if (!month || !day || !year) return "";
+    const formattedMonth = month.padStart(2, '0');
+    const formattedDay = day.padStart(2, '0');
+    return `${year}-${formattedMonth}-${formattedDay}`;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,7 +99,8 @@ export default function SignUpPage() {
       await signUp(email, password, {
         firstName,
         lastName,
-        birthday,
+        birthday: getBirthday(),
+        currentState,
       });
       setIsConfirmationSent(true);
     } catch (err: any) {
@@ -118,9 +139,14 @@ export default function SignUpPage() {
             We've sent a confirmation link to {email}
           </p>
           <div className="mt-8 space-y-4">
-            <p className="text-gray-500">
-              Please click the link in your email to activate your account. After confirming, you'll be asked to sign in.
-            </p>
+            <div className="space-y-2">
+              <p className="text-gray-500">
+                Please click the link in your email to activate your account.
+              </p>
+              <p className="text-gray-500">
+                After confirming, you'll be asked to sign in.
+              </p>
+            </div>
             <p className="text-sm text-gray-500">
               Didn't receive the email?{" "}
               <button 
@@ -218,16 +244,76 @@ export default function SignUpPage() {
               <label htmlFor="birthday" className="block text-sm font-medium text-gray-700">
                 Birthday
               </label>
-              <div className="mt-1">
+              <div className="mt-1 flex gap-2">
                 <input
-                  id="birthday"
-                  name="birthday"
-                  type="date"
-                  required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  value={birthday}
-                  onChange={(e) => setBirthday(e.target.value)}
+                  id="month"
+                  name="month"
+                  type="text"
+                  placeholder="MM"
+                  maxLength={2}
+                  value={month}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '');
+                    setMonth(val);
+                    if (val.length === 2 && parseInt(val) > 0 && parseInt(val) <= 12) {
+                      document.getElementById('day')?.focus();
+                    }
+                  }}
+                  className="appearance-none w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
+                <span className="text-gray-500 self-center">/</span>
+                <input
+                  id="day"
+                  name="day"
+                  type="text"
+                  placeholder="DD"
+                  maxLength={2}
+                  value={day}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '');
+                    setDay(val);
+                    if (val.length === 2 && parseInt(val) > 0 && parseInt(val) <= 31) {
+                      document.getElementById('year')?.focus();
+                    }
+                  }}
+                  className="appearance-none w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+                <span className="text-gray-500 self-center">/</span>
+                <input
+                  id="year"
+                  name="year"
+                  type="text"
+                  placeholder="YYYY"
+                  maxLength={4}
+                  value={year}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '');
+                    setYear(val);
+                  }}
+                  className="appearance-none w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="state" className="block text-sm font-medium text-gray-700">
+                Current State
+              </label>
+              <div className="mt-1">
+                <select
+                  id="state"
+                  name="state"
+                  value={currentState}
+                  onChange={(e) => setCurrentState(e.target.value)}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  required
+                >
+                  <option value="">Select a state</option>
+                  {US_STATES.map(state => (
+                    <option key={state} value={state}>
+                      {state}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
             <div>

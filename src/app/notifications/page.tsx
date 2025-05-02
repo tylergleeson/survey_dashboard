@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 // Mock data for notifications
 const notifications = [
@@ -28,7 +29,7 @@ const notifications = [
   },
 ];
 
-export default function Notifications() {
+function Notifications() {
   return (
     <div className="p-4 space-y-4">
       <Card className="bg-white shadow-lg">
@@ -77,5 +78,13 @@ export default function Notifications() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function ProtectedNotifications() {
+  return (
+    <ProtectedRoute>
+      <Notifications />
+    </ProtectedRoute>
   );
 } 

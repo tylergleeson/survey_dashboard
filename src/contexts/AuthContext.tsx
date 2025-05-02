@@ -58,6 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             last_name: userData.lastName,
             birthday: userData.birthday,
             email: email,
+            current_state: userData.currentState,
           },
         ]);
 
