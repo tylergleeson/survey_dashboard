@@ -68,6 +68,11 @@ const config: Config = {
           '0%': { transform: 'scale(1)' },
           '50%': { transform: 'scale(0.9)' },
           '100%': { transform: 'scale(1)' }
+        },
+        'white-ripple': {
+          '0%': { transform: 'scale(0.3)', opacity: '0.7' },
+          '70%': { transform: 'scale(1.2)', opacity: '0.2' },
+          '100%': { transform: 'scale(1.2)', opacity: '0' }
         }
       },
       animation: {
@@ -83,7 +88,9 @@ const config: Config = {
         'flash-bright': 'flash-bright 0.5s ease-out forwards',
         ripple: 'ripple 0.6s ease-out forwards',
         'power-up': 'power-up 0.5s ease-out forwards',
-        deflate: 'deflate 0.5s ease-out forwards'
+        deflate: 'deflate 0.5s ease-out forwards',
+        'white-ripple': 'white-ripple 1.2s cubic-bezier(0.4,0,0.2,1) infinite',
+        'white-ripple-slow': 'white-ripple 2s cubic-bezier(0.4,0,0.2,1) infinite'
       }
     }
   },

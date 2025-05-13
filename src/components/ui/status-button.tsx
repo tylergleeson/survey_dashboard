@@ -139,15 +139,21 @@ export default function StatusButton({ initialStatus = false, onToggle, classNam
         {/* Inner circle */}
         <div
           className={cn(
-            "absolute inset-1 rounded-full flex items-center justify-center transition-all duration-700",
+            "relative absolute inset-1 rounded-full flex items-center justify-center transition-all duration-700",
             isAnimating && direction === "offline" ? "scale-90" : "",
             isAnimating && direction === "online" ? "scale-105" : "",
             isOnline ? "bg-slate-500" : "bg-gradient-to-br from-blue-300 to-gray-300",
           )}
         >
+          {/* White ripple effect around 'GO' when offline */}
+          {!isOnline && (
+            <div
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full border-2 border-white bg-transparent pointer-events-none z-0 white-ripple-slow"
+            />
+          )}
           <span
             className={cn(
-              "font-bold text-xl transition-all duration-500 flex items-center gap-1",
+              "font-bold text-xl transition-all duration-500 flex items-center gap-1 z-10",
               isAnimating ? "opacity-0" : "opacity-100",
               isOnline ? "text-white" : "text-gray-700",
             )}
@@ -156,6 +162,12 @@ export default function StatusButton({ initialStatus = false, onToggle, classNam
           </span>
         </div>
       </button>
+
+      {/* Hidden div to ensure Tailwind JIT picks up the animation class */}
+      <div className="hidden animate-white-ripple"></div>
+
+      {/* Hidden div to force Tailwind to include the animation */}
+      <div className="hidden animate-white-ripple-slow"></div>
     </div>
   )
 } 
