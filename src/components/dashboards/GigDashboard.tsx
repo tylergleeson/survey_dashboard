@@ -2,6 +2,7 @@ import React from 'react';
 import { BellIcon, UserCircleIcon, ClockIcon, ClipboardDocumentIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '@/contexts/AuthContext';
 import { gigDashboardData, ActivityItem as ActivityItemType } from '@/lib/data/mock-dashboard';
+import StatusButton from '@/components/ui/status-button';
 
 interface StatCardProps {
   label: string;
@@ -41,7 +42,7 @@ export default function GigDashboard() {
   const { stats, recentActivity } = gigDashboardData;
 
   return (
-    <div className="min-h-screen bg-gray-900 p-6">
+    <div className="min-h-screen p-6">
       {/* Header Section */}
       <div className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-3">
@@ -62,14 +63,10 @@ export default function GigDashboard() {
 
       {/* Online Toggle Button */}
       <div className="flex justify-center mb-8">
-        <button
-          onClick={() => setIsOnline(!isOnline)}
-          className={`px-8 py-3 rounded-full text-white font-semibold transition-colors ${
-            isOnline ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-700 hover:bg-gray-600'
-          }`}
-        >
-          {isOnline ? 'GO OFFLINE' : 'GO ONLINE'}
-        </button>
+        <StatusButton
+          initialStatus={isOnline}
+          onToggle={setIsOnline}
+        />
       </div>
 
       {/* Stats Grid */}
