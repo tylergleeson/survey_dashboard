@@ -24,13 +24,13 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('normalization.log'),
+        logging.FileHandler(os.path.join('backend', 'normalization.log')),
         logging.StreamHandler()
     ]
 )
 
 # Set up cache directory and configuration
-CACHE_DIR = Path('cache')
+CACHE_DIR = Path('backend/cache')
 CACHE_DIR.mkdir(exist_ok=True)
 CACHE_EXPIRY_DAYS = 30  # Cache entries expire after 30 days
 
@@ -125,22 +125,35 @@ def save_to_cache(cache_key: str, normalized_value: str, confidence_score: float
 
 def get_db_connection():
     """
-    Create a database connection using environment variables
+    Create a database connection using Supabase credentials
     
     Returns:
         psycopg2.connection: Database connection
     """
     try:
+        # Get Supabase connection details from environment variables
+        supabase_url = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
+        supabase_db_password = os.getenv("SUPABASE_DB_PASSWORD")
+        
+        if not supabase_url or not supabase_db_password:
+            raise ValueError("Missing Supabase credentials. Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_DB_PASSWORD in .env.local")
+        
+        # Extract database connection details from Supabase URL
+        # Supabase URL format: https://<project-ref>.supabase.co
+        project_ref = supabase_url.split('//')[1].split('.')[0]
+        
+        # Construct connection string using database password
+        # Using the direct connection string format from Supabase dashboard
+        conn_string = f"postgresql://postgres.{project_ref}:{supabase_db_password}@aws-0-us-west-1.pooler.supabase.com:5432/postgres"
+        
+        # Add SSL mode
         conn = psycopg2.connect(
-            dbname=os.getenv("POSTGRES_DB"),
-            user=os.getenv("POSTGRES_USER"),
-            password=os.getenv("POSTGRES_PASSWORD"),
-            host=os.getenv("POSTGRES_HOST", "localhost"),
-            port=os.getenv("POSTGRES_PORT", "5432")
+            conn_string,
+            sslmode='require'
         )
         return conn
     except Exception as e:
-        logging.error(f"Error connecting to database: {e}")
+        logging.error(f"Error connecting to Supabase: {e}")
         return None
 
 def verify_table_exists():
@@ -244,7 +257,7 @@ def get_existing_values(column_name):
 
 def get_user_approval(input_value, normalized_value, confidence_score):
     """
-    Get user approval for a new normalized value
+    Automatically approve normalized values
     
     Args:
         input_value (str): Original input value
@@ -254,22 +267,12 @@ def get_user_approval(input_value, normalized_value, confidence_score):
     Returns:
         str: Approved normalized value
     """
-    print(f"\nNormalization proposal:")
+    print(f"\nNormalization applied:")
     print(f"Original value: {input_value}")
-    print(f"Proposed value: {normalized_value}")
+    print(f"Normalized value: {normalized_value}")
     print(f"Confidence score: {confidence_score:.2f}")
     
-    if confidence_score >= 0.9:
-        print("High confidence match - auto-approved")
-        return normalized_value
-    
-    response = input("Approve this normalization? (y/n, or enter new value): ").strip()
-    if response.lower() == 'y':
-        return normalized_value
-    elif response.lower() == 'n':
-        return input_value
-    else:
-        return response
+    return normalized_value
 
 def normalize_with_gpt(input_value, column_name, existing_values):
     """
@@ -531,7 +534,7 @@ def generate_sql(data):
 
 def save_sql(sql_content, original_filepath):
     """
-    Save the SQL statements to a file
+    Save the SQL statements to a file and execute them against the database
     
     Args:
         sql_content (str): SQL statements
@@ -539,10 +542,86 @@ def save_sql(sql_content, original_filepath):
     """
     # Create SQL filename based on original filename
     base_name = os.path.splitext(os.path.basename(original_filepath))[0]
-    sql_filepath = os.path.join(os.path.dirname(original_filepath), f"{base_name}.sql")
+    sql_filepath = os.path.join('backend', f"{base_name}.sql")
     
+    # Clean the SQL content
+    # Remove any markdown formatting and explanatory text
+    sql_content = sql_content.replace('```sql', '').replace('```', '')
+    # Find the actual INSERT statement
+    if 'INSERT INTO' in sql_content:
+        sql_content = sql_content[sql_content.find('INSERT INTO'):]
+        # Remove everything after the semicolon
+        if ';' in sql_content:
+            sql_content = sql_content[:sql_content.find(';') + 1]
+    
+    # Save SQL to file
     with open(sql_filepath, 'w') as f:
         f.write(sql_content)
+    print(f"SQL statements saved to: {sql_filepath}")
+    
+    # Execute SQL against the database
+    conn = get_db_connection()
+    if not conn:
+        print("Error: Could not connect to database. SQL statements were saved but not executed.")
+        return sql_filepath
+    
+    try:
+        with conn.cursor() as cur:
+            # First verify the table exists
+            cur.execute("""
+                SELECT EXISTS (
+                    SELECT FROM information_schema.tables 
+                    WHERE table_name = 'demographic_analysis'
+                );
+            """)
+            table_exists = cur.fetchone()[0]
+            
+            if not table_exists:
+                print("Creating demographic_analysis table...")
+                cur.execute("""
+                    CREATE TABLE demographic_analysis (
+                        id SERIAL PRIMARY KEY,
+                        age INTEGER,
+                        occupation VARCHAR(100),
+                        location VARCHAR(100),
+                        zip_code VARCHAR(10),
+                        gender VARCHAR(20),
+                        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        prediction_location VARCHAR(100),
+                        prediction_employment VARCHAR(100),
+                        prediction_income VARCHAR(100),
+                        prediction_education VARCHAR(100),
+                        prediction_health VARCHAR(100),
+                        prediction_crime VARCHAR(100),
+                        prediction_environment VARCHAR(100),
+                        prediction_culture VARCHAR(100),
+                        prediction_transportation VARCHAR(100),
+                        prediction_housing VARCHAR(100),
+                        prediction_technology VARCHAR(100),
+                        prediction_social VARCHAR(100),
+                        prediction_economic VARCHAR(100)
+                    );
+                """)
+                print("Table created successfully.")
+            
+            # Execute the cleaned SQL
+            print(f"Executing SQL: {sql_content.strip()}")
+            cur.execute(sql_content)
+            
+            conn.commit()
+            print("Successfully executed SQL statements against the database.")
+            
+            # Verify the data was inserted
+            cur.execute("SELECT COUNT(*) FROM demographic_analysis;")
+            count = cur.fetchone()[0]
+            print(f"Current number of records in table: {count}")
+            
+    except Exception as e:
+        print(f"Error executing SQL statements: {e}")
+        print("SQL statements were saved but not executed.")
+        conn.rollback()
+    finally:
+        conn.close()
     
     return sql_filepath
 
@@ -602,7 +681,7 @@ class NormalizationStats:
 # Global stats object
 stats = NormalizationStats()
 
-def export_cache_to_csv(filename: str = 'cache_export.csv'):
+def export_cache_to_csv(filename: str = 'backend/cache_export.csv'):
     """
     Export cache entries to a CSV file
     """

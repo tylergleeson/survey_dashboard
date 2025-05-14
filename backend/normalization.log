@@ -1,0 +1,109 @@
+2025-05-14 03:09:34,695 - ERROR - Error connecting to database: connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2025-05-14 03:10:53,731 - ERROR - Error connecting to database: connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2025-05-14 03:20:38,999 - ERROR - Error connecting to Supabase: Missing Supabase credentials. Please set SUPABASE_URL and SUPABASE_KEY in .env.local
+2025-05-14 03:22:58,593 - ERROR - Error connecting to Supabase: connection to server at "db.qfcpdhycaexdokhyltzs.supabase.co" (2600:1f1c:f9:4d10:fb85:44c7:c0a6:9f22), port 5432 failed: FATAL:  password authentication failed for user "postgres"
+connection to server at "db.qfcpdhycaexdokhyltzs.supabase.co" (2600:1f1c:f9:4d10:fb85:44c7:c0a6:9f22), port 5432 failed: FATAL:  password authentication failed for user "postgres"
+
+2025-05-14 03:24:57,522 - ERROR - Error connecting to Supabase: connection to server at "db.qfcpdhycaexdokhyltzs.supabase.co" (2600:1f1c:f9:4d10:fb85:44c7:c0a6:9f22), port 5432 failed: FATAL:  password authentication failed for user "postgres"
+connection to server at "db.qfcpdhycaexdokhyltzs.supabase.co" (2600:1f1c:f9:4d10:fb85:44c7:c0a6:9f22), port 5432 failed: FATAL:  password authentication failed for user "postgres"
+
+2025-05-14 03:26:43,613 - ERROR - Error connecting to Supabase: connection to server at "db.qfcpdhycaexdokhyltzs.supabase.co" (2600:1f1c:f9:4d10:fb85:44c7:c0a6:9f22), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2025-05-14 03:26:54,083 - ERROR - Error connecting to Supabase: connection to server at "db.qfcpdhycaexdokhyltzs.supabase.co" (2600:1f1c:f9:4d10:fb85:44c7:c0a6:9f22), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2025-05-14 03:29:07,438 - ERROR - Error connecting to Supabase: connection to server at "db.qfcpdhycaexdokhyltzs.supabase.co" (2600:1f1c:f9:4d10:fb85:44c7:c0a6:9f22), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2025-05-14 03:30:03,174 - ERROR - Error connecting to Supabase: connection to server at "db.qfcpdhycaexdokhyltzs.supabase.co" (2600:1f1c:f9:4d10:fb85:44c7:c0a6:9f22), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2025-05-14 03:30:42,353 - ERROR - Error connecting to Supabase: connection to server at "aws-0-us-west-1.pooler.supabase.com" (54.177.55.191), port 5432 failed: error received from server in SCRAM exchange: Wrong password
+
+2025-05-14 03:34:16,756 - ERROR - Error connecting to Supabase: connection to server at "db.qfcpdhycaexdokhyltzs.supabase.co" (2600:1f1c:f9:4d10:fb85:44c7:c0a6:9f22), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2025-05-14 03:35:24,644 - INFO - Retrieved 3 existing values for location
+2025-05-14 03:35:25,820 - INFO - Retrieved 3 existing values for occupation
+2025-05-14 03:35:26,583 - INFO - Retrieved 2 existing values for gender
+2025-05-14 03:35:28,407 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 03:35:28,420 - INFO - Normalized washington dc -> Washington DC (confidence: 0.50)
+2025-05-14 03:35:39,525 - INFO - User approved normalization: washington dc -> Washington DC
+2025-05-14 03:35:40,875 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 03:35:40,876 - INFO - Normalized consultant -> Consultant (confidence: 0.50)
+2025-05-14 03:35:44,884 - INFO - User approved normalization: consultant -> Consultant
+2025-05-14 03:35:46,084 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 03:35:46,086 - INFO - Normalized male -> male (confidence: 1.00)
+2025-05-14 03:35:47,635 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 03:35:47,637 - INFO - Normalized Full-time salaried employee at a consulting firm -> Full-time Salaried Employee at a Consulting Firm (confidence: 0.50)
+2025-05-14 03:35:57,111 - INFO - User approved normalization: Full-time salaried employee at a consulting firm -> Full-time Salaried Employee at a Consulting Firm
+2025-05-14 03:35:58,741 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 03:35:58,745 - INFO - Normalized Lives in Shaw neighborhood of Washington DC -> Washington DC (confidence: 0.50)
+2025-05-14 03:36:07,592 - INFO - User approved normalization: Lives in Shaw neighborhood of Washington DC -> Washington DC
+2025-05-14 03:36:23,272 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 03:40:05,083 - ERROR - Error connecting to Supabase: connection to server at "aws-0-us-west-1.pooler.supabase.com" (54.177.55.191), port 5432 failed: error received from server in SCRAM exchange: Wrong password
+
+2025-05-14 03:40:05,842 - INFO - Retrieved 3 existing values for occupation
+2025-05-14 03:40:06,651 - INFO - Retrieved 2 existing values for gender
+2025-05-14 03:40:06,654 - INFO - Cache hit for 837774ebeaf0c792661933d6a49a5117 -> Washington DC
+2025-05-14 03:40:06,654 - INFO - Cache hit for washington dc -> Washington DC
+2025-05-14 03:40:06,655 - INFO - Cache hit for e02446346573c1b23244857cfcb03865 -> Consultant
+2025-05-14 03:40:06,655 - INFO - Cache hit for consultant -> Consultant
+2025-05-14 03:40:06,655 - INFO - Cache hit for 4fd540f9a1687b7073f49927118f7a1e -> male
+2025-05-14 03:40:06,656 - INFO - Cache hit for male -> male
+2025-05-14 03:40:06,656 - INFO - Cache hit for f176708c9ab83f02760bab304d0c9d23 -> Full-time Salaried Employee at a Consulting Firm
+2025-05-14 03:40:06,656 - INFO - Cache hit for Full-time salaried employee at a consulting firm -> Full-time Salaried Employee at a Consulting Firm
+2025-05-14 03:40:06,656 - INFO - Cache hit for d8123d26541d87d38e08ecbc22f98079 -> Washington DC
+2025-05-14 03:40:06,657 - INFO - Cache hit for Lives in Shaw neighborhood of Washington DC -> Washington DC
+2025-05-14 03:40:20,291 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 03:41:45,432 - INFO - Retrieved 3 existing values for location
+2025-05-14 03:41:46,167 - INFO - Retrieved 3 existing values for occupation
+2025-05-14 03:41:46,910 - INFO - Retrieved 2 existing values for gender
+2025-05-14 03:41:46,913 - INFO - Cache hit for 837774ebeaf0c792661933d6a49a5117 -> Washington DC
+2025-05-14 03:41:46,914 - INFO - Cache hit for washington dc -> Washington DC
+2025-05-14 03:41:46,914 - INFO - Cache hit for e02446346573c1b23244857cfcb03865 -> Consultant
+2025-05-14 03:41:46,914 - INFO - Cache hit for consultant -> Consultant
+2025-05-14 03:41:46,915 - INFO - Cache hit for 4fd540f9a1687b7073f49927118f7a1e -> male
+2025-05-14 03:41:46,915 - INFO - Cache hit for male -> male
+2025-05-14 03:41:46,916 - INFO - Cache hit for f176708c9ab83f02760bab304d0c9d23 -> Full-time Salaried Employee at a Consulting Firm
+2025-05-14 03:41:46,916 - INFO - Cache hit for Full-time salaried employee at a consulting firm -> Full-time Salaried Employee at a Consulting Firm
+2025-05-14 03:41:46,916 - INFO - Cache hit for d8123d26541d87d38e08ecbc22f98079 -> Washington DC
+2025-05-14 03:41:46,916 - INFO - Cache hit for Lives in Shaw neighborhood of Washington DC -> Washington DC
+2025-05-14 03:41:59,781 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 03:42:45,716 - INFO - Retrieved 3 existing values for location
+2025-05-14 03:42:46,559 - INFO - Retrieved 3 existing values for occupation
+2025-05-14 03:42:47,456 - INFO - Retrieved 2 existing values for gender
+2025-05-14 03:42:47,459 - INFO - Cache hit for 837774ebeaf0c792661933d6a49a5117 -> Washington DC
+2025-05-14 03:42:47,459 - INFO - Cache hit for washington dc -> Washington DC
+2025-05-14 03:42:47,460 - INFO - Cache hit for e02446346573c1b23244857cfcb03865 -> Consultant
+2025-05-14 03:42:47,460 - INFO - Cache hit for consultant -> Consultant
+2025-05-14 03:42:47,461 - INFO - Cache hit for 4fd540f9a1687b7073f49927118f7a1e -> male
+2025-05-14 03:42:47,461 - INFO - Cache hit for male -> male
+2025-05-14 03:42:47,462 - INFO - Cache hit for f176708c9ab83f02760bab304d0c9d23 -> Full-time Salaried Employee at a Consulting Firm
+2025-05-14 03:42:47,462 - INFO - Cache hit for Full-time salaried employee at a consulting firm -> Full-time Salaried Employee at a Consulting Firm
+2025-05-14 03:42:47,462 - INFO - Cache hit for d8123d26541d87d38e08ecbc22f98079 -> Washington DC
+2025-05-14 03:42:47,463 - INFO - Cache hit for Lives in Shaw neighborhood of Washington DC -> Washington DC
+2025-05-14 03:43:05,008 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-14 03:43:58,347 - INFO - Retrieved 3 existing values for location
+2025-05-14 03:43:59,134 - INFO - Retrieved 3 existing values for occupation
+2025-05-14 03:43:59,875 - INFO - Retrieved 2 existing values for gender
+2025-05-14 03:43:59,878 - INFO - Cache hit for 837774ebeaf0c792661933d6a49a5117 -> Washington DC
+2025-05-14 03:43:59,878 - INFO - Cache hit for washington dc -> Washington DC
+2025-05-14 03:43:59,878 - INFO - Cache hit for e02446346573c1b23244857cfcb03865 -> Consultant
+2025-05-14 03:43:59,879 - INFO - Cache hit for consultant -> Consultant
+2025-05-14 03:43:59,879 - INFO - Cache hit for 4fd540f9a1687b7073f49927118f7a1e -> male
+2025-05-14 03:43:59,879 - INFO - Cache hit for male -> male
+2025-05-14 03:43:59,879 - INFO - Cache hit for f176708c9ab83f02760bab304d0c9d23 -> Full-time Salaried Employee at a Consulting Firm
+2025-05-14 03:43:59,879 - INFO - Cache hit for Full-time salaried employee at a consulting firm -> Full-time Salaried Employee at a Consulting Firm
+2025-05-14 03:43:59,880 - INFO - Cache hit for d8123d26541d87d38e08ecbc22f98079 -> Washington DC
+2025-05-14 03:43:59,880 - INFO - Cache hit for Lives in Shaw neighborhood of Washington DC -> Washington DC
+2025-05-14 03:44:15,314 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
