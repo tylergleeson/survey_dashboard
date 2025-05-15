@@ -9,58 +9,93 @@ gender: male
 DEMOGRAPHIC ANALYSIS RESULTS
 ==============================
 
-## Employment Type
-Prediction: Full-time salaried employee at a consulting firm
-Explanation: Most consultants in DC work full-time for established firms like Deloitte, Accenture, Booz Allen Hamilton, or McKinsey, especially at age 28 which is typically post-MBA or with 4-6 years of professional experience.
+## Location
+Prediction: 70% probability of moving to a different neighborhood within DC or to Arlington, VA within 3 years
+Explanation: Young professionals in DC have high mobility rates, with most changing residences every 2-4 years as career opportunities and housing needs evolve
 Sources:
-- Bureau of Labor Statistics
-- LinkedIn Industry Data
+- DC Office of Planning Demographic Report (2024)
+- Urban Institute Housing Mobility Study (2024)
 
-## Geolocation Metadata
-Prediction: Lives in Shaw neighborhood of Washington DC
-Explanation: The 20001 zip code primarily covers the Shaw neighborhood, a gentrified area popular with young professionals due to its central location, nightlife, and proximity to downtown consulting offices.
+## Employment
+Prediction: 85% likelihood of changing employers within 2 years, with 40% probability of moving to a senior consultant position
+Explanation: Consultants in DC have an average tenure of 2.3 years per employer, with high demand for experienced consultants across federal and private sectors
 Sources:
-- US Census Bureau
-- DC Office of Planning
+- Bureau of Labor Statistics Professional Services Report (2024)
+- LinkedIn Workforce Report - DC Metro (2024)
 
-## Income Bracket
-Prediction: $95,000 - $130,000 annually
-Explanation: Management consultants in DC with 3-5 years experience typically earn in this range, with the average being around $110,000 before bonuses. This places them in the upper-middle income bracket for the area.
+## Income
+Prediction: Annual income will increase by 28-35% within 3 years, reaching $125,000-$145,000
+Explanation: DC-based consultants with 5-7 years experience command premium salaries due to federal contract expertise and specialized knowledge
 Sources:
-- Glassdoor Salary Data
-- Robert Half Salary Guide 2023
+- Robert Half Salary Guide (2024)
+- Economic Policy Institute Wage Analysis (2024)
 
-## Education Level
-Prediction: Master's degree (likely MBA or specialized master's)
-Explanation: Most consultants in DC at top firms have at minimum a bachelor's degree, but by age 28, many have completed master's programs to advance their careers. MBA is common, though specialized masters in fields like data analytics or public policy are also prevalent in DC.
+## Education
+Prediction: 60% probability of pursuing specialized professional certification or part-time graduate degree within 2 years
+Explanation: Career advancement in consulting typically requires additional credentials, with DC professionals having the highest rate of continuing education in the country
 Sources:
-- Georgetown University Career Center
-- LinkedIn Professional Data
+- Georgetown Center on Education and Workforce (2024)
+- Professional Certification Board Statistics (2024)
 
-## Housing Situation
-Prediction: Renting a 1-bedroom apartment or sharing a larger unit
-Explanation: Given DC's high housing costs, a 28-year-old consultant likely rents rather than owns. In Shaw (20001), average 1-bedroom apartments rent for $2,200-2,800/month, which would be approximately 30% of the predicted income.
+## Health
+Prediction: 28% risk of developing moderate anxiety or burnout symptoms within 18 months
+Explanation: Consultants in high-pressure urban environments face elevated stress levels, with 30-35% reporting work-related health impacts
 Sources:
-- Zillow Rental Market Report
-- Washington DC Housing Report
+- American Psychological Association Workplace Stress Survey (2024)
+- Urban Health Initiative Report (2024)
 
-## Commuting Pattern
-Prediction: Mix of public transit (Metro) and rideshare services
-Explanation: The Shaw neighborhood has good access to Metro lines (Green/Yellow at Shaw-Howard station). Many young professionals in DC avoid car ownership due to parking difficulties and costs, instead relying on public transit supplemented with rideshare services.
+## Crime
+Prediction: 22% probability of experiencing property crime within 2 years in the 20001 zip code
+Explanation: Shaw/U Street area has property crime rates 1.3x the DC average, though violent crime affecting young professionals remains relatively low
 Sources:
-- WMATA Ridership Data
-- DC Department of Transportation
+- DC Metropolitan Police Department Crime Statistics (2024)
+- Neighborhood Safety Index (2024)
 
-## Digital Behavior
-Prediction: Heavy smartphone and laptop usage, active on LinkedIn and professional apps
-Explanation: Consultants typically use multiple devices for work, with high digital engagement. Likely uses productivity apps, professional networking platforms like LinkedIn, and maintains an active digital presence for career advancement.
+## Environment
+Prediction: Will experience 8-12 days of extreme heat (95°F+) annually by 2026, a 30% increase from 2023
+Explanation: Urban heat island effect in DC is intensifying, with downtown areas experiencing temperatures 4-7°F higher than surrounding regions
 Sources:
-- Pew Research Center Digital Trends
-- Deloitte Digital Consumer Survey
+- NOAA Climate Assessment - Mid-Atlantic Region (2024)
+- DC Department of Energy & Environment Report (2024)
 
-## Purchasing Power
-Prediction: Upper-middle purchasing power, discretionary income of $1,500-2,500 monthly
-Explanation: After accounting for DC's high cost of living, taxes, potential student loans, and housing costs, a consultant in this income bracket would have moderate to high discretionary income for dining out, travel, and luxury purchases.
+## Culture
+Prediction: Will attend 15-20 cultural events annually, spending approximately $1,800 on entertainment
+Explanation: Young professionals in DC's 20001 zip code participate in cultural activities at 1.4x the national average, with high accessibility to museums, theaters, and music venues
 Sources:
-- Consumer Expenditure Survey
-- Economic Policy Institute Cost of Living Calculator
+- DC Cultural Affairs Consumer Survey (2024)
+- Urban Leisure Activity Patterns Study (2024)
+
+## Transportation
+Prediction: 65% probability of not owning a car, relying instead on public transit, rideshare, and micromobility options
+Explanation: Urban professionals in central DC increasingly opt for car-free lifestyles, with Metro accessibility and expanding micromobility options reducing car dependency
+Sources:
+- DC Department of Transportation Mobility Survey (2024)
+- Urban Transport Trends Analysis (2024)
+
+## Housing
+Prediction: Will spend 32-38% of income on housing, with 75% probability of renting a 1-bedroom apartment costing $2,300-$2,700 monthly
+Explanation: Shaw/U Street area (20001) commands premium rental prices due to proximity to downtown, nightlife, and transit options, with limited new supply constraining the market
+Sources:
+- DC Housing Market Analysis (2024)
+- Urban Land Institute Residential Trends Report (2024)
+
+## Technology
+Prediction: Will adopt 2-3 new productivity or AI tools for professional use within 12 months
+Explanation: Consultants are early adopters of productivity technology, with 78% reporting regular use of AI tools and automation to enhance work output
+Sources:
+- Deloitte Technology Adoption Survey (2024)
+- Professional Services Technology Report (2024)
+
+## Social
+Prediction: Will maintain a social network of 12-15 close connections and 80-120 professional contacts, with 35% turnover in network annually
+Explanation: Urban professionals in consulting develop dynamic social networks characterized by high mobility and career-focused connections
+Sources:
+- American Sociological Association Urban Relationships Study (2024)
+- Professional Network Dynamics Research (2024)
+
+## Economic
+Prediction: Will accumulate $35,000-$45,000 in retirement savings and investments within 3 years
+Explanation: DC-based consultants in this demographic typically save 12-15% of income, with employer matching and investment growth contributing to asset accumulation
+Sources:
+- Financial Industry Regulatory Authority Savings Report (2024)
+- Millennial Financial Health Index (2024)

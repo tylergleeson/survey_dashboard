@@ -413,6 +413,160 @@ def normalize_data(data):
     
     return normalized
 
+def validate_confidence_level(confidence: str) -> str:
+    """
+    Validate and standardize confidence levels
+    
+    Args:
+        confidence (str): Raw confidence level
+        
+    Returns:
+        str: Standardized confidence level
+    """
+    # Define valid confidence levels and their variations
+    confidence_levels = {
+        'high': ['high', 'very high', 'very high confidence', 'high confidence', 'strong', 'strong confidence'],
+        'medium': ['medium', 'moderate', 'moderate confidence', 'medium confidence', 'average', 'average confidence'],
+        'low': ['low', 'very low', 'very low confidence', 'low confidence', 'weak', 'weak confidence']
+    }
+    
+    # Convert to lowercase and strip whitespace
+    confidence = confidence.lower().strip()
+    
+    # Check for numeric confidence scores (0-1 range)
+    try:
+        score = float(confidence)
+        if 0 <= score <= 1:
+            if score >= 0.8:
+                return 'High'
+            elif score >= 0.5:
+                return 'Medium'
+            else:
+                return 'Low'
+    except ValueError:
+        pass
+    
+    # Check against known variations
+    for standard_level, variations in confidence_levels.items():
+        if confidence in variations:
+            return standard_level.capitalize()
+    
+    # If no match found, return Medium as default
+    logging.warning(f"Invalid confidence level '{confidence}' - defaulting to Medium")
+    return 'Medium'
+
+def normalize_prediction_values(predictions):
+    """
+    Normalize prediction values to ensure consistency across all rows
+    
+    Args:
+        predictions (dict): Raw predictions from the LLM
+        
+    Returns:
+        dict: Normalized predictions with consistent formatting
+    """
+    normalized = {}
+    
+    # Define standard formats for each category
+    standard_formats = {
+        "employment_type": {
+            "patterns": {
+                r"full[-\s]?time": "Full-time",
+                r"part[-\s]?time": "Part-time",
+                r"contract": "Contract",
+                r"freelance": "Freelance",
+                r"self[-\s]?employed": "Self-employed"
+            },
+            "default": "Full-time"
+        },
+        "income_bracket": {
+            "patterns": {
+                r"\$(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*-\s*\$(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)": lambda m: f"${m.group(1)} - ${m.group(2)}",
+                r"(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*-\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)": lambda m: f"${m.group(1)} - ${m.group(2)}"
+            },
+            "default": "Not specified"
+        },
+        "education_level": {
+            "patterns": {
+                r"bachelor['']?s": "Bachelor's degree",
+                r"master['']?s": "Master's degree",
+                r"ph\.?d": "PhD",
+                r"associate['']?s": "Associate's degree",
+                r"high school": "High school diploma"
+            },
+            "default": "Not specified"
+        },
+        "housing_status": {
+            "patterns": {
+                r"rent(?:ing|ed)?": "Renting",
+                r"own(?:ing|ed)?": "Owning",
+                r"mortgage": "Mortgage",
+                r"apartment": "Apartment",
+                r"house": "House"
+            },
+            "default": "Not specified"
+        },
+        "work_schedule_type": {
+            "patterns": {
+                r"9[-\s]?5": "9-5",
+                r"flexible": "Flexible",
+                r"shift": "Shift work",
+                r"remote": "Remote",
+                r"hybrid": "Hybrid"
+            },
+            "default": "Not specified"
+        }
+    }
+    
+    import re
+    
+    for category, data in predictions.items():
+        normalized[category] = data.copy()
+        
+        # Get the prediction value
+        prediction = data.get('prediction', '')
+        
+        # Check if we have a standard format for this category
+        if category in standard_formats:
+            format_rules = standard_formats[category]
+            
+            # Try to match against known patterns
+            matched = False
+            for pattern, replacement in format_rules['patterns'].items():
+                if isinstance(replacement, str):
+                    if re.search(pattern, prediction, re.IGNORECASE):
+                        normalized[category]['prediction'] = replacement
+                        matched = True
+                        break
+                else:
+                    # Handle lambda functions for complex replacements
+                    match = re.search(pattern, prediction)
+                    if match:
+                        normalized[category]['prediction'] = replacement(match)
+                        matched = True
+                        break
+            
+            # If no match found, use default
+            if not matched:
+                normalized[category]['prediction'] = format_rules['default']
+        
+        # Normalize confidence levels
+        if 'confidence' in data:
+            normalized[category]['confidence'] = validate_confidence_level(data['confidence'])
+        else:
+            normalized[category]['confidence'] = 'Medium'  # Default confidence level
+        
+        # Normalize sources to include year
+        if 'sources' in data:
+            sources = []
+            for source in data['sources']:
+                if not re.search(r'\d{4}', source):
+                    source = f"{source} (2024)"
+                sources.append(source)
+            normalized[category]['sources'] = sources
+    
+    return normalized
+
 def read_demographic_file(filepath):
     """
     Read and parse the demographic analysis file
@@ -462,9 +616,12 @@ def read_demographic_file(filepath):
     if current_category and current_data:
         predictions[current_category] = current_data
     
+    # Normalize the predictions
+    normalized_predictions = normalize_prediction_values(predictions)
+    
     return {
         'input_data': input_data,
-        'predictions': predictions
+        'predictions': normalized_predictions
     }
 
 def generate_sql(data):
@@ -485,26 +642,64 @@ def generate_sql(data):
     The table 'demographic_analysis' already exists with the following structure:
     
     CREATE TABLE demographic_analysis (
-        id SERIAL PRIMARY KEY,
-        age INTEGER,
-        occupation VARCHAR(100),
-        location VARCHAR(100),
-        zip_code VARCHAR(10),
-        gender VARCHAR(20),
-        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        -- Primary key
+        id BIGSERIAL PRIMARY KEY,
+        
+        -- Basic demographic information
+        age INTEGER NOT NULL,
+        occupation VARCHAR(100) NOT NULL,
+        location VARCHAR(100) NOT NULL,
+        zip_code VARCHAR(10) NOT NULL,
+        gender VARCHAR(20) NOT NULL,
+        
+        -- Timestamp for record creation
+        created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+        
+        -- Predictions with their confidence levels
         prediction_location VARCHAR(100),
+        prediction_location_confidence VARCHAR(20) CHECK (prediction_location_confidence IN ('High', 'Medium', 'Low')),
+        
         prediction_employment VARCHAR(100),
+        prediction_employment_confidence VARCHAR(20) CHECK (prediction_employment_confidence IN ('High', 'Medium', 'Low')),
+        
         prediction_income VARCHAR(100),
+        prediction_income_confidence VARCHAR(20) CHECK (prediction_income_confidence IN ('High', 'Medium', 'Low')),
+        
         prediction_education VARCHAR(100),
+        prediction_education_confidence VARCHAR(20) CHECK (prediction_education_confidence IN ('High', 'Medium', 'Low')),
+        
         prediction_health VARCHAR(100),
+        prediction_health_confidence VARCHAR(20) CHECK (prediction_health_confidence IN ('High', 'Medium', 'Low')),
+        
         prediction_crime VARCHAR(100),
+        prediction_crime_confidence VARCHAR(20) CHECK (prediction_crime_confidence IN ('High', 'Medium', 'Low')),
+        
         prediction_environment VARCHAR(100),
+        prediction_environment_confidence VARCHAR(20) CHECK (prediction_environment_confidence IN ('High', 'Medium', 'Low')),
+        
         prediction_culture VARCHAR(100),
+        prediction_culture_confidence VARCHAR(20) CHECK (prediction_culture_confidence IN ('High', 'Medium', 'Low')),
+        
         prediction_transportation VARCHAR(100),
+        prediction_transportation_confidence VARCHAR(20) CHECK (prediction_transportation_confidence IN ('High', 'Medium', 'Low')),
+        
         prediction_housing VARCHAR(100),
+        prediction_housing_confidence VARCHAR(20) CHECK (prediction_housing_confidence IN ('High', 'Medium', 'Low')),
+        
         prediction_technology VARCHAR(100),
+        prediction_technology_confidence VARCHAR(20) CHECK (prediction_technology_confidence IN ('High', 'Medium', 'Low')),
+        
         prediction_social VARCHAR(100),
-        prediction_economic VARCHAR(100)
+        prediction_social_confidence VARCHAR(20) CHECK (prediction_social_confidence IN ('High', 'Medium', 'Low')),
+        
+        prediction_economic VARCHAR(100),
+        prediction_economic_confidence VARCHAR(20) CHECK (prediction_economic_confidence IN ('High', 'Medium', 'Low')),
+        
+        -- Constraints
+        CONSTRAINT valid_age CHECK (age > 0 AND age < 120),
+        CONSTRAINT valid_zip_code CHECK (zip_code ~ '^\d{5}(-\d{4})?$'),
+        CONSTRAINT valid_gender CHECK (gender IN ('male', 'female', 'non-binary', 'other'))
     );
     
     Input Data:
@@ -516,15 +711,58 @@ def generate_sql(data):
     Requirements:
     1. Generate only INSERT statements for the existing table
     2. Map the input data and predictions to the appropriate columns
-    3. Use the CURRENT_TIMESTAMP for the timestamp column
+    3. Do NOT include id, created_at, or updated_at in the INSERT statement (they are handled automatically)
     4. Make the SQL compatible with PostgreSQL
     5. Handle NULL values appropriately for missing data
+    6. Include confidence levels for each prediction (must be one of: 'High', 'Medium', 'Low')
+    7. Ensure all column names match exactly with the schema
+    8. Ensure all values meet the constraints:
+       - age must be between 1 and 119
+       - zip_code must match pattern ^\d{5}(-\d{4})?$
+       - gender must be one of: 'male', 'female', 'non-binary', 'other'
+       - confidence levels must be one of: 'High', 'Medium', 'Low'
+    9. Map predictions to their corresponding columns:
+       - location -> prediction_location
+       - employment -> prediction_employment
+       - income -> prediction_income
+       - education -> prediction_education
+       - health -> prediction_health
+       - crime -> prediction_crime
+       - environment -> prediction_environment
+       - culture -> prediction_culture
+       - transportation -> prediction_transportation
+       - housing -> prediction_housing
+       - technology -> prediction_technology
+       - social -> prediction_social
+       - economic -> prediction_economic
+    10. IMPORTANT: All prediction values MUST be under 100 characters. Truncate each prediction to its core message:
+       - Keep only the key numbers and essential information
+       - Remove all explanatory text
+       - Remove all context and background
+       - Remove all qualifiers and conditions
+       - Examples of proper truncation:
+         * "Annual income will increase from current DC consultant average of $110,000 to $135,000 within 2 years" -> "Income $135K in 2 years"
+         * "Will maintain 75% of recommended physical activity levels (150 minutes/week), with 65% probability of experiencing work-related stress" -> "75% activity, 65% stress"
+         * "Will adopt 3-4 new professional technology platforms within 18 months, spending 65+ hours weekly connected to digital devices" -> "3-4 new tech platforms in 18mo"
+         * "Will maintain active social network of 12-15 close connections and 150-180 professional contacts, with 40% turnover in network over 3 years" -> "12-15 close contacts, 40% turnover"
+         * "Will accumulate $45,000-$55,000 in retirement savings within 3 years, with 60% probability of carrying $20,000-$30,000 in student debt" -> "$45-55K savings, $20-30K debt"
     """
     
     response = client.chat.completions.create(
         model="gpt-4",
         messages=[
-            {"role": "system", "content": "You are a SQL expert. Generate clean, well-formatted SQL INSERT statements for an existing table."},
+            {"role": "system", "content": """You are a SQL expert. Generate clean, well-formatted SQL INSERT statements for an existing table.
+            Follow these rules strictly:
+            1. Do not include id, created_at, or updated_at columns as they are handled automatically
+            2. Match column names exactly as shown in the schema
+            3. Ensure all values meet the constraints
+            4. Use proper PostgreSQL syntax
+            5. Format the SQL for readability
+            6. Map predictions to their corresponding columns exactly as specified
+            7. Include confidence levels for each prediction
+            8. Truncate all prediction values to be under 100 characters
+            9. Keep only the essential information in predictions
+            10. Remove all explanatory text and context"""},
             {"role": "user", "content": prompt}
         ],
         temperature=0.2
@@ -580,26 +818,64 @@ def save_sql(sql_content, original_filepath):
                 print("Creating demographic_analysis table...")
                 cur.execute("""
                     CREATE TABLE demographic_analysis (
-                        id SERIAL PRIMARY KEY,
-                        age INTEGER,
-                        occupation VARCHAR(100),
-                        location VARCHAR(100),
-                        zip_code VARCHAR(10),
-                        gender VARCHAR(20),
-                        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        -- Primary key
+                        id BIGSERIAL PRIMARY KEY,
+                        
+                        -- Basic demographic information
+                        age INTEGER NOT NULL,
+                        occupation VARCHAR(100) NOT NULL,
+                        location VARCHAR(100) NOT NULL,
+                        zip_code VARCHAR(10) NOT NULL,
+                        gender VARCHAR(20) NOT NULL,
+                        
+                        -- Timestamp for record creation
+                        created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                        
+                        -- Predictions with their confidence levels
                         prediction_location VARCHAR(100),
+                        prediction_location_confidence VARCHAR(20) CHECK (prediction_location_confidence IN ('High', 'Medium', 'Low')),
+                        
                         prediction_employment VARCHAR(100),
+                        prediction_employment_confidence VARCHAR(20) CHECK (prediction_employment_confidence IN ('High', 'Medium', 'Low')),
+                        
                         prediction_income VARCHAR(100),
+                        prediction_income_confidence VARCHAR(20) CHECK (prediction_income_confidence IN ('High', 'Medium', 'Low')),
+                        
                         prediction_education VARCHAR(100),
+                        prediction_education_confidence VARCHAR(20) CHECK (prediction_education_confidence IN ('High', 'Medium', 'Low')),
+                        
                         prediction_health VARCHAR(100),
+                        prediction_health_confidence VARCHAR(20) CHECK (prediction_health_confidence IN ('High', 'Medium', 'Low')),
+                        
                         prediction_crime VARCHAR(100),
+                        prediction_crime_confidence VARCHAR(20) CHECK (prediction_crime_confidence IN ('High', 'Medium', 'Low')),
+                        
                         prediction_environment VARCHAR(100),
+                        prediction_environment_confidence VARCHAR(20) CHECK (prediction_environment_confidence IN ('High', 'Medium', 'Low')),
+                        
                         prediction_culture VARCHAR(100),
+                        prediction_culture_confidence VARCHAR(20) CHECK (prediction_culture_confidence IN ('High', 'Medium', 'Low')),
+                        
                         prediction_transportation VARCHAR(100),
+                        prediction_transportation_confidence VARCHAR(20) CHECK (prediction_transportation_confidence IN ('High', 'Medium', 'Low')),
+                        
                         prediction_housing VARCHAR(100),
+                        prediction_housing_confidence VARCHAR(20) CHECK (prediction_housing_confidence IN ('High', 'Medium', 'Low')),
+                        
                         prediction_technology VARCHAR(100),
+                        prediction_technology_confidence VARCHAR(20) CHECK (prediction_technology_confidence IN ('High', 'Medium', 'Low')),
+                        
                         prediction_social VARCHAR(100),
-                        prediction_economic VARCHAR(100)
+                        prediction_social_confidence VARCHAR(20) CHECK (prediction_social_confidence IN ('High', 'Medium', 'Low')),
+                        
+                        prediction_economic VARCHAR(100),
+                        prediction_economic_confidence VARCHAR(20) CHECK (prediction_economic_confidence IN ('High', 'Medium', 'Low')),
+                        
+                        -- Constraints
+                        CONSTRAINT valid_age CHECK (age > 0 AND age < 120),
+                        CONSTRAINT valid_zip_code CHECK (zip_code ~ '^\d{5}(-\d{4})?$'),
+                        CONSTRAINT valid_gender CHECK (gender IN ('male', 'female', 'non-binary', 'other'))
                     );
                 """)
                 print("Table created successfully.")
@@ -956,18 +1232,31 @@ def process_single_file():
             gender VARCHAR(20),
             timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             prediction_location VARCHAR(100),
+            prediction_location_confidence VARCHAR(20),
             prediction_employment VARCHAR(100),
+            prediction_employment_confidence VARCHAR(20),
             prediction_income VARCHAR(100),
+            prediction_income_confidence VARCHAR(20),
             prediction_education VARCHAR(100),
+            prediction_education_confidence VARCHAR(20),
             prediction_health VARCHAR(100),
+            prediction_health_confidence VARCHAR(20),
             prediction_crime VARCHAR(100),
+            prediction_crime_confidence VARCHAR(20),
             prediction_environment VARCHAR(100),
+            prediction_environment_confidence VARCHAR(20),
             prediction_culture VARCHAR(100),
+            prediction_culture_confidence VARCHAR(20),
             prediction_transportation VARCHAR(100),
+            prediction_transportation_confidence VARCHAR(20),
             prediction_housing VARCHAR(100),
+            prediction_housing_confidence VARCHAR(20),
             prediction_technology VARCHAR(100),
+            prediction_technology_confidence VARCHAR(20),
             prediction_social VARCHAR(100),
-            prediction_economic VARCHAR(100)
+            prediction_social_confidence VARCHAR(20),
+            prediction_economic VARCHAR(100),
+            prediction_economic_confidence VARCHAR(20)
         );
         """)
         return

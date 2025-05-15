@@ -24,27 +24,21 @@ def analyze_demographics(person_data):
     # Format the input data for the prompt
     input_str = "\n".join([f"{k}: {v}" for k, v in person_data.items()])
     
-    # Define the categories to predict
+    # Define the categories to predict - matching exactly with SQL schema
     prediction_categories = [
-        "employment_type",
-        "geolocation_metadata",
-        "income_bracket",
-        "education_level",
-        "housing_status",
-        "family_status",
-        "work_schedule_type",
-        "gig_work_likelihood",
-        "technology_comfort_level",
-        "media_consumption_style",
-        "political_leaning",
-        "urban_rural_classification",
-        "industry_sector",
-        "emotional_tone",
-        "consumer_preferences",
-        "response_quality_score",
-        "career_stage",
-        "marital_status",
-        "roommate_likelihood"
+        "location",
+        "employment",
+        "income",
+        "education",
+        "health",
+        "crime",
+        "environment",
+        "culture",
+        "transportation",
+        "housing",
+        "technology",
+        "social",
+        "economic"
     ]
     
     # Create the prediction categories formatted string
@@ -52,25 +46,52 @@ def analyze_demographics(person_data):
     
     # STEP 1: Gather data using web search
     research_prompt = f"""
-    Research the following demographic information:
+    Research and analyze the following demographic information:
     {input_str}
 
-    For each of these categories, gather current information and make predictions:
+    For each of these categories, provide detailed predictions following these rules:
+    1. Each prediction must be specific and quantifiable where possible
+    2. Include exact numbers, percentages, or ranges when available
+    3. Base predictions on current (2024) data and trends
+    4. Consider local factors (zip code, city) for location-specific predictions
+    5. Account for age-specific trends and patterns
+    6. Include industry-specific data for occupation-based predictions
+
+    Categories to analyze:
     {categories_str}
 
-    Include specific data points and sources for each prediction.
+    For each category:
+    1. Make a specific, data-driven prediction
+    2. Provide a brief explanation citing specific factors
+    3. List 2-3 authoritative sources with dates
+    4. Include confidence level (high/medium/low) based on data quality
+    5. Note any significant variations or exceptions
+
+    Focus on accuracy and specificity over generality.
     """
     
     research_message = client.messages.create(
         model="claude-3-7-sonnet-20250219",
         max_tokens=4000,
         temperature=0.2,
-        system="You are a demographic research expert. Use web search to gather current information about demographics, locations, and trends. Provide detailed predictions with specific data points and sources.",
+        system="""You are a demographic research expert specializing in precise, data-driven analysis. 
+        Your task is to provide specific, quantifiable predictions based on current data and trends.
+        Follow these guidelines:
+        1. Be precise and specific in all predictions
+        2. Use exact numbers and ranges when available
+        3. Consider local context and demographics
+        4. Base predictions on current (2024) data
+        5. Include confidence levels with each prediction (must be one of: 'High', 'Medium', 'Low')
+        6. Cite specific, authoritative sources
+        7. Account for industry-specific factors
+        8. Consider age-related trends
+        9. Note any significant variations
+        10. Maintain objectivity and avoid assumptions""",
         messages=[{"role": "user", "content": research_prompt}],
         tools=[
             {
                 "name": "web_search",
-                "description": "Search the web for information",
+                "description": "Search the web for current information",
                 "input_schema": {
                     "type": "object",
                     "properties": {
@@ -101,33 +122,47 @@ def analyze_demographics(person_data):
     
     # STEP 2: Format the research as JSON
     json_prompt = f"""
-    Format the following research into a JSON object:
-    
-    {research_message.content[0].text}
-    
-    The JSON must follow this exact structure:
+    Format the following research into a JSON object with this exact structure:
     {{
-        "employment_type": {{
-            "prediction": "specific prediction",
-            "explanation": "brief explanation",
-            "sources": ["source1", "source2"]
-        }},
-        "geolocation_metadata": {{
-            "prediction": "specific prediction",
-            "explanation": "brief explanation",
-            "sources": ["source1", "source2"]
+        "category_name": {{
+            "prediction": "specific, quantifiable prediction",
+            "explanation": "brief explanation citing specific factors",
+            "sources": ["source1 (2024)", "source2 (2024)"],
+            "confidence": "high/medium/low",
+            "variations": ["notable variation 1", "notable variation 2"]
         }}
-        // ... continue for all categories
     }}
     
-    CRITICAL: Return ONLY the JSON object. No other text.
+    Research content:
+    {research_message.content[0].text}
+    
+    Requirements:
+    1. Each prediction must be specific and quantifiable
+    2. Include confidence levels (must be one of: 'High', 'Medium', 'Low')
+    3. List variations where applicable
+    4. Use current (2024) sources
+    5. Return ONLY the JSON object
+    6. Match category names exactly with the schema:
+       - location
+       - employment
+       - income
+       - education
+       - health
+       - crime
+       - environment
+       - culture
+       - transportation
+       - housing
+       - technology
+       - social
+       - economic
     """
     
     json_message = client.messages.create(
         model="claude-3-7-sonnet-20250219",
         max_tokens=4000,
         temperature=0.2,
-        system="You are a JSON formatting bot. Your ONLY task is to convert the given research into a valid JSON object. Do not include any text before or after the JSON.",
+        system="You are a JSON formatting bot. Your ONLY task is to convert the given research into a valid JSON object with specific, quantifiable predictions. Do not include any text before or after the JSON.",
         messages=[{"role": "user", "content": json_prompt}]
     )
     
